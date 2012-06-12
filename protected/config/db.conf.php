@@ -25,9 +25,9 @@ $dbconfig['dev'] = getDataConfiguration();
 function getDataConfiguration() {
 	switch ($_SERVER['HTTP_HOST']) {
 		case 'local';
-			return array('localhost', 'database', 'root', 'pwd', 'mysql', false, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
+			return array('localhost', 'main', 'root', '', 'sqlite', false, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
 		default:
-			return array('localhost', 'database', 'root', 'pwd', 'mysql', false, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
+			return array('localhost', 'main', 'root', '', 'sqlite', false, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
 	}
 }
 
