@@ -46,11 +46,11 @@ function setExceptionHandler($e){
 		//print_r($matches);
 		$last = $matches[sizeof($matches)-1];
 		$lastfile = $last[sizeof($last)-1];
-
+		
 		preg_match_all('/\[line\] \=\> (.+)\n/', $err, $matches);
 		$last2 = $matches[sizeof($matches)-1];
 		$lastline = $last2[sizeof($last2)-1];
-
+		
 		if($e instanceof PDOException){
 			foreach($last as $k=>$l){
 				if(strpos(str_replace('\\','/',$l), str_replace('\\','/',Doo::conf()->SITE_PATH))===0){
@@ -60,21 +60,14 @@ function setExceptionHandler($e){
 			}
 			$lastline = $last2[$k];
 		}
-
+		
 		setErrorHandler('Exception', $e->getMessage(), $lastfile, $lastline);
 	}
 }
 
 function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
     Doo::loadHelper('DooTextHelper');
-	#
-    # @author Peter.Ge.
-    # @modify 2012.1.6
-    # fix reporting all error that ignore error_reporting setting.
-    $error_reporting = ini_get('error_reporting');
-    if ( ($error_reporting & $errno) != $errno ){
-        return true;
-    }
+	
 	//require
 	if($errno==2 && strpos($errstr, 'require_once(')===0 && strpos(str_replace('\\','/',$errfile), str_replace('\\','/',Doo::conf()->BASE_PATH).'Doo.php')===0){
 		$dmsg = debug_backtrace();
@@ -114,7 +107,7 @@ function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
 			$errline = $dmsg[0]['args'][3];
 		}
 	}
-
+	
     $script = file_get_contents($errfile);
     $script = DooTextHelper::highlightPHP($script);
 
@@ -139,7 +132,7 @@ function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
 		$lines[0] = str_replace('<code>','',$lines[0]);
 		$lines[sizeof($lines)-1] = str_replace('</code>','',$lines[sizeof($lines)-1]);
 	}
-
+	
     $imgloader = Doo::conf()->SUBFOLDER . 'index.php?doodiagnostic_pic=';
 
 	if (ob_get_level() !== 0) {
@@ -156,7 +149,7 @@ function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
 
     echo "<html><head><title>DooPHP Diagnostics - $errstr</title>";
 	echo '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />';
-
+	
     //css
     echo '<style>
             html{padding:0px;margin:0px;}
@@ -196,7 +189,7 @@ function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
             ol, pre{background:#fff;border:1px solid #c0ff0e;padding:20px 20px 20px 20px;margin:20px;}
             li{font-size:14px;line-height:20px;margin-left:30px;font-family:Georgia;}
             .error_backtrace{font-family:Georgia;font-size:18px;padding:0px;margin:0px;}
-
+			
 			.back{
 				background:#8FD5E9;
 				color:#FFFFFF;
@@ -268,7 +261,7 @@ function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
     if(isset($errLineContent)){
 		echo "<h3>".$errLineContent."</h3>";
 	}
-
+	
     //error code script
     echo $pre.'<code id="scriptcode" class="scriptcode">';
 	if(isset($lines)){
@@ -285,20 +278,20 @@ function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
 	}else{
 	    errorBacktrace();
 	}
-
+    
     echo '<br/><hr/><h2 class="var" style="background-color:#4370A4;color:#fff;width:760px;padding:5px;"> * Variables... <a id="bpanelConf" href="javascript:code(0);">&nbsp;Conf </a> . <a id="bpanelGet" href="javascript:code(1);">&nbsp;GET&nbsp;</a> . <a id="bpanelPost" href="javascript:code(2);">&nbsp;POST&nbsp;</a> . <a id="bpanelSession" href="javascript:code(3);">&nbsp;Session&nbsp;</a> . <a id="bpanelCookie" href="javascript:code(4);">&nbsp;Cookie&nbsp;</a></h2>';
-
+	
 	//config data
     echo '<pre id="goVar">';
-
+	
 	$confData = str_replace(']=&gt;<br />&nbsp;&nbsp;','] =>&nbsp;',DooTextHelper::highlightPHP($confData));
 	echo str_replace('<code>', '<code id="panelConf">',$confData);
-
+	
 	if(!empty($_GET)){
 		$getData = str_replace(']=&gt;<br />&nbsp;&nbsp;','] =>&nbsp;',DooTextHelper::highlightPHP($getData));
 		echo str_replace('<code>', "<code id=\"panelGet\"><span style=\"color:#0000BB;\">\$_GET Variables</span>", $getData);
 	}
-
+	
 	if(!empty($_POST)){
 		$postData = str_replace(']=&gt;<br />&nbsp;&nbsp;','] =>&nbsp;',DooTextHelper::highlightPHP($postData));
 		echo str_replace('<code>', "<code id=\"panelPost\"><span style=\"color:#0000BB;\">\$_POST Variables</span>", $postData);
@@ -313,9 +306,9 @@ function setErrorHandler($errno, $errstr, $errfile, $errline, $errcontext=null){
 		$cookieData = str_replace(']=&gt;<br />&nbsp;&nbsp;','] =>&nbsp;',DooTextHelper::highlightPHP($cookieData));
 		echo str_replace('<code>', "<code id=\"panelCookie\"><span style=\"color:#0000BB;\">\$_COOKIE Variables</span>", $cookieData);
 	}
-
+	
     echo '</pre><br/>';
-
+	
     echo "</div><div class=\"back\"><a href=\"#top\">BACK TO TOP </a></div></body></html>";
     exit;
 }
@@ -355,7 +348,7 @@ function shutdown(){
     }
 }
 
-
+	
 function errorBacktrace() {
     $trace = array_reverse(debug_backtrace());
 	array_pop($trace);
@@ -363,12 +356,12 @@ function errorBacktrace() {
     echo '<ol>';
     foreach($trace as $item)
         echo '<li><span style="color:#3A66CC">' . (isset($item['file']) ? $item['file'] : '<unknown file>') . '</span><strong style="color:#DD0000">(' . (isset($item['line']) ? $item['line'] : '<unknown line>') . ')</strong> calling <span style="color:#0000BB">' . $item['function'] . '()</span></li>';
-    echo '</ol>';
+    echo '</ol>';    
 }
 
 class DooDebugException extends Exception{
     public $var;
-
+    
     public function __construct($var, $message='Debugging App',$code=999) {
         parent::__construct($message,$code);
         $this->var = $var;

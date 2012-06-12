@@ -44,7 +44,7 @@
  * echo $pager->components['page_size'];
  * //echo $pager->components['next_link'];
  * </code>
- *
+ * 
  * @author Leng Sheng Hong <darkredz@gmail.com>
  * @version $Id: DooPager.php 1000 2009-08-21 15:27:22
  * @package doo.helper
@@ -166,7 +166,7 @@ class DooPager{
      * @var string
      */
     public $low;
-
+    
     /**
      * Position of the record to end the pagination LIMIT query
      * @var string
@@ -266,7 +266,7 @@ a:hover .paginate{
 
     /**
      * Paginate the list of items and prepare pager components to be use in View.
-     *
+     * 
      * @param int $page The current page number
      * @param int $itemPerPage Items per page
      * @return array An array of pager component, access via <strong>pages, jump_menu, page_size, current_page, total_page, next_link, prev_link</strong>
@@ -280,12 +280,12 @@ a:hover .paginate{
 
         $this->totalPage = ceil($this->totalItem/$itemPerPage);
 
-        $this->currentPage = (int) $page;
+        $this->currentPage = (int) $page; 
 
         if($this->currentPage < 1 || !is_numeric($this->currentPage))
             $this->currentPage = 1;
 
-        if($this->currentPage > $this->totalPage && $this->totalPage > 0)
+        if($this->currentPage > $this->totalPage)
             $this->currentPage = $this->totalPage;
 
         $prev_page = $this->currentPage-1;
@@ -298,7 +298,7 @@ a:hover .paginate{
 
         if($this->totalPage > $this->maxLength){
             $midRange = $this->maxLength-2;
-
+            
             $start_range = $this->currentPage - floor($midRange/2);
             $end_range = $this->currentPage + floor($midRange/2);
 
@@ -315,14 +315,14 @@ a:hover .paginate{
             while($end_range-$start_range+1<$this->maxLength-1){
                 $end_range++;
             }
-
+            
             $modulus = (int) $this->maxLength%2==0;
             $center = floor($this->maxLength/2);
-
+                
             if($this->currentPage > $center ){
                 $end_range --;
             }
-
+            
             if($modulus==0 && $this->totalPage - $this->currentPage+1 <= $center){
                 while($end_range-$start_range+1<$this->maxLength-1){
                     $start_range--;

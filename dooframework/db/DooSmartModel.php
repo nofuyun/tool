@@ -651,12 +651,12 @@ class DooSmartModel{
 
     //--------------- dynamic querying --------------
     public function __call($name, $args){
+
         // $food->getById( $id );
         // $food->getById(14);
         // $food->getById(14, array('limit'=>1)) ;
         // $food->getById_location(14, 'Malaysia') ;
         // $food->getById_location(14, 'Malaysia', array('limit'=>1)) ;
-        
         if(strpos($name, 'get')===0){
             if(self::$caseSensitive==false){
                 $field = strtolower( substr($name,5));
@@ -784,7 +784,7 @@ class DooSmartModel{
             }else{
                 Doo::loadModel($relatedClass);
                 $id = self::toCacheId($args[0], 'relate' . $relatedClass, $args[1]);
-//                if($rs = self::getCache($id)) return $rs;
+                if($rs = self::getCache($id)) return $rs;
                 $value = Doo::db()->relate( $args[0], $relatedClass, $args[1]);
             }
 

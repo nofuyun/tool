@@ -165,7 +165,7 @@ class DooUriRouter{
      */
     public function execute($routeArr,$subfolder='/'){
         list($route, $params) = $this->connect($routeArr,$subfolder);
-        
+
         if($route[0]==='redirect'){
             if(sizeof($route)===2)
                 self::redirect($route[1]);
@@ -216,10 +216,6 @@ class DooUriRouter{
             exit;
     }
 
-    //kaiwen: changed from REQUEST_URI to REDIRECT_URL to support apache rewrite
-    public static function getUrlKey() {
-        return isset($_SERVER['REDIRECT_URL']) ? 'REDIRECT_URL' : 'REQUEST_URI';
-    }
 
 	/**
      * Matching the route array with the request URI
@@ -248,13 +244,12 @@ class DooUriRouter{
 		//$this->log('Subfolder: ' . $subfolder);
 
 		$type = strtolower($_SERVER['REQUEST_METHOD']);
-		$requestedUri = $_SERVER[DooUriRouter::getUrlKey()];
-		#$requestedUri = $_SERVER['REDIRECT_URL'];
-		
+		$requestedUri = $_SERVER['REQUEST_URI'];
+
 		if (isset($routes['force_lowercase']) && $routes['force_lowercase'] === true) {
 			$requestedUri = strtolower($requestedUri);
 		}
-		
+
 		//$this->log('Type: ' . $type);
 		//$this->log('Requested Uri: ' . $requestedUri);
 
@@ -286,7 +281,7 @@ class DooUriRouter{
 		$requestedUri = substr($requestedUri, 0, $end+1);
 
 		//$this->log('Trimmed off trailing slashes from Request Uri: ' . $requestedUri);
-		
+
 
 		// Got a root url (ie. Homepage)
 		if ($requestedUri === '/') {
@@ -347,14 +342,14 @@ class DooUriRouter{
 
 		$uriPartsOrig = explode('/', $requestedUri);
 		$uriPartsSize = sizeof($uriPartsOrig);
-		
+
 		$uriExtension = false;
 		if (false !== ($pos = strpos($uriPartsOrig[$uriPartsSize-1], '.')) ) {
 			$uriExtension = substr($uriPartsOrig[$uriPartsSize-1], $pos);
 			$uriLastPartNoExtension = substr($uriPartsOrig[$uriPartsSize-1], 0, $pos);
 			//$this->log('URI Extension is: ' . $uriExtension);
 		}
-		
+
 		if ($skipNormalRoutes===false) {
 			foreach($possibleRoutes as $routeKey=>$routeData) {
 				//$this->log('Trying routeKey: ' . $routeKey);
@@ -366,10 +361,6 @@ class DooUriRouter{
 					continue;	// Not enough parts in route to match our current uri?
 				}
 
-//print_r($possibleRoutes);
-//print_r($routeParts);
-//exit;
-				
 				// If first part of uri not match first part of route then skip.
 				// We expect ALL routes at this stage to begin with a static segment.
 				// Note: We exploded with a leading / so element 0 in both arrays is an empty string
@@ -561,7 +552,7 @@ class DooUriRouter{
 				return array($routeData, $params);
 			}
 		}
-		
+
 		//$this->log('Failed to find a matching route');
 	}
 

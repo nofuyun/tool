@@ -17,7 +17,7 @@
  * @since 1.1
  */
 class DooGdImage {
-
+    
     /**
      * Path to store the uploaded image files
      * @var string
@@ -83,9 +83,6 @@ class DooGdImage {
      */
     public $timeAsName = true;
 
-    public $code;
-    public $charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
     /**
      * Construtor for DooGdImage
      *
@@ -136,7 +133,7 @@ class DooGdImage {
 
     /**
      * Creates an image from a resouce based on the generatedType
-     *
+     * 
      * @param resource $img The image resource
      * @param string $file File name to be stored.
      * @return bool
@@ -163,7 +160,7 @@ class DooGdImage {
 
     /**
      * Crops an image.
-     *
+     * 
      * @param string $file Image file name
      * @param int $cropWidth Width to be cropped
      * @param int $cropHeight Height to be cropped
@@ -258,7 +255,7 @@ class DooGdImage {
 
     /**
      * Resize/Generates thumbnail from an existing image file.
-     *
+     * 
      * @param string $file The image file name.
      * @param int $width Width of the thumbnail
      * @param int $height Height of the thumbnail
@@ -268,7 +265,7 @@ class DooGdImage {
     public function createThumb($file, $width=128, $height=128, $rename=''){
         $file = $this->uploadPath . $file;
         $imginfo = $this->getInfo($file);
-
+        
         if($rename=='')
             $newName = substr($imginfo['name'], 0, strrpos($imginfo['name'], '.')) . $this->thumbSuffix .'.'. $this->generatedType;
         else
@@ -314,7 +311,7 @@ class DooGdImage {
             imagedestroy($newImg);
             imagedestroy($img);
         }
-
+        
         return true;
     }
 
@@ -345,7 +342,7 @@ class DooGdImage {
     public function adaptiveResize($file, $width, $height, $rename='') {
         $file = $this->uploadPath . $file;
         $imginfo = $this->getInfo($file);
-
+        
         if($rename=='')
             $newName = substr($imginfo['name'], 0, strrpos($imginfo['name'], '.')) . $this->thumbSuffix .'.'. $this->generatedType;
         else
@@ -412,7 +409,7 @@ class DooGdImage {
 
         if(!$img) return false;
 
-		if (($imginfo['width'] / $imginfo['height']) > ($width / $height) ) {
+		if (($imginfo['width'] / $imginfo['height']) > ($width / $height) ) {	
 			$srcY = 0;
 			$srcH = $imginfo['height'];
 			$srcW = round($width / ($height / $imginfo['height']));
@@ -510,7 +507,7 @@ class DooGdImage {
             $newImg = imagecreate($resizeWidth, $resizeHeight);
             imagecopyresampled($newImg, $img, ($width-$resizeWidth)/2, ($height-$resizeHeight)/2, 0, 0, $resizeWidth, $resizeHeight, $imginfo['width'], $imginfo['height']);
         }
-
+		
 		imagedestroy($img);
 
         if($this->saveFile){
@@ -532,7 +529,7 @@ class DooGdImage {
 
     /**
      * Add water mark text to an image.
-     *
+     * 
      * @param string $file Image file name
      * @param string $text Text to be added as water mark
      * @param int $maxWidth Maximum width of the processed image
@@ -661,7 +658,7 @@ class DooGdImage {
             imagecopyresampled($new, $img, 0, 0, 0, 0, $imgInfo['width'], $imgInfo['height'], $imgInfo['width'], $imgInfo['height']);
         }
 		imagedestroy($img);
-
+		
 		imagecopy($new, $watermarkImg, $destX, $destY, 0, 0, $watermarkImgInfo['width'], $watermarkImgInfo['height']);
 		imagedestroy($watermarkImg);
 
@@ -819,7 +816,7 @@ class DooGdImage {
 
     /**
      * Save the uploaded image(s) in HTTP File Upload variables
-     *
+     * 
      * @param string $filename The file field name in $_FILES HTTP File Upload variables
      * @param string $rename Rename the uploaded file (without extension)
      * @return string|array The file name of the uploaded image.
@@ -979,72 +976,6 @@ class DooGdImage {
             }
             return true;
         }
-    }
-
-    /**
-     * 生成随机字符
-     * @param <type> $len 字符长度
-     */
-    protected function creatCode($len){
-        $code = '';
-        $charset_len  = strlen($this->charset)-1;
-        for ($i=0; $i<$len; $i++){
-            $code .= $this->charset[rand(1,$charset_len)];
-        }
-        $this->code = $code;
-    }
-    /**
-     * 返回生成的字符
-     * @return <type> string
-     */
-    public function getCode(){
-        return strtolower($this->code);
-    }
-    /**
-     * 生成验证码
-     * @param <type> $len 长度
-     * @param <type> $width 宽度
-     * @param <type> $height 高度
-     */
-    public function captcha($len,$width,$height){
-        $code = $this->creatCode($len);
-        $im   = imagecreatetruecolor($width,$height);
-        $color= imagecolorallocate($im, rand(0,156), rand(0,156), rand(0,156));
-        $background = imagecolorallocate($im,hexdec(substr('#EDF7FF', 1,2)),hexdec(substr('#EDF7FF', 3,2)),hexdec(substr('#EDF7FF', 5,2)));
-        imagefilledrectangle($im,0, $height, $width, 0, $background);
-        $x = $width/$len;
-        $font = Doo::conf()->SITE_PATH.'global/font/cri.ttf'; // 这里记得改路径
-        $size = 16;
-        for ($i=0; $i<$len; $i++) {
-            imagettftext($im, $size, rand(-30,30), $x*$i+rand(0,5), $height/1.4, $color, $font, $this->code[$i]);
-        }
-        imagesetthickness($im, 3);
-        $xpos   = ($size * 2) + rand(-5, 5);
-        $_width  = $width / 2.66 + rand(3, 10);
-        $_height = $size * 2.14;
-        if ( rand(0,100) % 2 == 0 ) {
-            $start = rand(0,66);
-            $ypos  = $height / 2 - rand(10, 30);
-            $xpos += rand(5, 15);
-        }else{
-            $start = rand(180, 246);
-            $ypos  = $height / 2 + rand(10, 30);
-        }
-        $end = $start + rand(75, 110);
-//        imagearc($im, $xpos, $ypos, $_width, $_height, $start, $end, $color);
-        if ( rand(1,75) % 2 == 0 ) {
-            $start = rand(45, 111);
-            $ypos  = $height / 2 - rand(10, 30);
-            $xpos += rand(5, 15);
-        }else{
-            $start = rand(200, 250);
-            $ypos  = $height / 2 + rand(10, 30);
-        }
-        $end = $start + rand(75, 100);
-//        imagearc($im, $width * .75, $ypos, $_width, $_height, $start, $end, $color);
-        header("content-type:image/png\r\n");
-        imagepng($im);
-        imagedestroy($im);
     }
 
 }

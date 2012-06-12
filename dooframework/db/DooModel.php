@@ -554,6 +554,7 @@ class DooModel{
 
     //--------------- dynamic querying --------------
     public function __call($name, $args){
+
         // $food->getById( $id );
         // $food->getById(14);
         // $food->getById(14, array('limit'=>1)) ;

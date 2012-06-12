@@ -49,7 +49,7 @@ class DooSqlMagic {
      * @var bool
      */
     public $connected = false;
-
+    
     /**
      * Path to the folder where the model class files are located. Ends with a slash. eg. /var/www/modelfiles/
      * @var string
@@ -71,21 +71,21 @@ class DooSqlMagic {
     const JOIN_RIGHT_OUTER = 'RIGHT OUTER';
     const JOIN_INNER = 'INNER';
     const JOIN = '';
-
+    
     public function loadModel($className, $createObj=false){
         if( class_exists($className, false)===true ){
-            if($createObj===true){
+            if($createObj===true){           
                 return new $className;
             }
             return;
         }
-
+        
         if(empty($this->modelPath)===true) {
             return Doo::loadModel($className, $createObj);
         }
         else {
             require_once $this->modelPath . $className . '.php';
-
+            
             if($createObj===true){
                 return new $className;
             }
@@ -141,7 +141,6 @@ class DooSqlMagic {
      * Connects to the database with the default database connection configuration
      */
     public function connect(){
-
         if($this->dbconfig==NULL)return;
 
         try{
@@ -198,7 +197,7 @@ class DooSqlMagic {
         $this->pdo = null;
         $this->connected = false;
     }
-
+    
     /**
      * Initiates a transaction. Transactions can be nestable.
      */
@@ -364,7 +363,7 @@ class DooSqlMagic {
     public function get_query_count(){
         return $this->getQueryCount();
     }
-
+    
     /**
      * Get the number of queries executed
      * @return int
@@ -523,7 +522,7 @@ class DooSqlMagic {
         }
 
         //conditions WHERE
-        if(isset($opt['where']) && $opt['where'] != ''){
+        if(isset($opt['where'])){
             $sqladd['where']= 'WHERE ' . $opt['where'];
         }else{
             $sqladd['where'] ='';
@@ -608,7 +607,7 @@ class DooSqlMagic {
 		} else {
 			$sqladd['having'] = '';
 		}
-
+        
         //if asc is defined first then ORDER BY xxx ASC, xxx DESC
         //else Order by xxx DESC, xxx ASC
         if(isset($opt['asc']) && isset($opt['desc']) && $opt['asc']!='' && $opt['desc']!=''){
@@ -643,7 +642,6 @@ class DooSqlMagic {
         $sql ="SELECT {$sqladd['select']} FROM {$model->_table} {$sqladd['filter']} {$sqladd['where']} {$sqladd['groupby']} {$sqladd['having']} {$sqladd['order']} {$sqladd['custom']} {$sqladd['limit']}";
 
         //conditions WHERE param
-        //echo $sql."<br/>";
         if(isset($opt['param']) && isset($where_values))
             $rs = $this->query($sql, array_merge( $opt['param'], $where_values));
         else if(isset($opt['param']))
@@ -684,6 +682,7 @@ class DooSqlMagic {
             $class_name = get_class($model);
             //auto search(add conditions to WHERE) if the model propertie(s) are/is set
             $obj = get_object_vars($model);
+
             $wheresql ='';
             $where_values = array();
             foreach($obj as $o=>$v){
@@ -769,6 +768,7 @@ class DooSqlMagic {
             $opt['limit']='';
             $sqladd['limit']='';
         }
+
 
         //conditions WHERE
         if(isset($opt['where'])){
@@ -887,8 +887,6 @@ class DooSqlMagic {
 
 		} else {
 			list($rtype,$rparams) = self::relationType($this->map, $class_name, $rmodel);
-			//$rparams = Array ( [foreign_key] => post_id [through] => post_tag )
-			//$rtype = has_many
 			if($rtype==NULL)
 				throw new SqlMagicException("Model $class_name does not relate to $rmodel", SqlMagicException::RelationNotFound);
 
@@ -904,8 +902,6 @@ class DooSqlMagic {
         //reverse relation (belongs_to), checking params such as foreign_key
         #list($mtype,$mparams) = $relatedmodel->relationType($class_name);
         list($mtype,$mparams) = self::relationType($this->map, $rmodel, $class_name);
-        // $mparams = Array ( [foreign_key] => tag_id [through] => post_tag )
-        // $mtype = has_many
         if($mtype==NULL)
             throw new SqlMagicException("Model $rmodel does not relate to $class_name. This is a reverse check.", SqlMagicException::RelationNotFound);
 
@@ -1024,10 +1020,10 @@ class DooSqlMagic {
 			}
         }
 
-        //print_r($model_vars);exit;
-        //print_r($rmodel_vars);exit;
-        //print_r($repeated_vars);exit;
-
+        #print_r($model_vars);
+        #print_r($rmodel_vars);
+        #print_r($repeated_vars);
+        
         //include model, reduce a lot of queries, merge 3 related models together, eg. Post, PostCategory, PostComment
         if(isset($opt['include'])){
             $tmodel = null;
@@ -1257,6 +1253,7 @@ class DooSqlMagic {
                             if(substr(trim($orderLimit), strlen(trim($orderLimit))-1)==',')
                                 $orderLimit = substr(trim($orderLimit), 0, strlen(trim($orderLimit))-1). ' ';
                         }
+
                         if(isset($opt['where']) && $opt['where']!=''){
                             //remove Rmodel field names from the WHERE statement
                             $whrLimit = preg_replace("/[,|AND|OR ]*$relatedmodel->_table\.[a-z0-9_-]{1,64}[^{$model->_table}\.]*/i", '', $opt['where']);
@@ -1283,6 +1280,7 @@ class DooSqlMagic {
                                     else if($rlimitMatch[strlen($rlimitMatch)-1]=='A'){
                                         $rlimitMatch = substr($rlimitMatch, 0, strlen($rlimitMatch)-1);
                                     }
+
                                     if(isset($opt['param'])){
                                         $rStmtLimit = $this->query("SELECT {$relatedmodel->_table}.{$relatedmodel->_primarykey} FROM {$relatedmodel->_table} WHERE {$rlimitMatch} LIMIT 1", $opt['param']);
                                         $rStmtId = $rStmtLimit->fetch();
@@ -1302,6 +1300,7 @@ class DooSqlMagic {
                                 }
                             }
                         }
+
                         if($opt['limit']==1 || $opt['limit']=='first'){
                             $opt['limit'] = 'first';
                             $limitstr = 1;
@@ -1466,7 +1465,7 @@ class DooSqlMagic {
                                 $inAsSelect = preg_match('/[\s]+(as|AS|aS|As)[\s]+'. $k2 .',/', $oriSel.',');
 
 								if($inAsSelect || in_array($k2, $model_vars)){
-										if( !$inAsSelect && $oriSel[0]!=='*' &&
+										if( !$inAsSelect && $oriSel[0]!=='*' && 
                                             !preg_match("/,(\s+)?({$model->_table}\.)?$k2(\s+)?,/", ','.$oriSel.',') &&
 											!preg_match('/,(\s+)?'.$model->_table .'\.\*/', ','. str_replace($model->_table .'.'. str_replace('_'.$model->_table.'__', '', $k2), $model->_table.'.*', $oriSel)) ){
 
@@ -1493,8 +1492,8 @@ class DooSqlMagic {
 
                                     if( isset($ralias_vars[$k2]) ){
                                         $k2 = $ralias_vars[$k2];
-                                    }
-
+                                    }	
+	
                                     if($oriSel[0]!=='*'){
                                         if(	in_array($k2, $rmodel_vars)===false &&
                                             !preg_match('/,(\s+)?'.$relatedmodel->_table .'\.\*/', ','. str_replace($relatedmodel->_table .'.'. $k2, $relatedmodel->_table .'.*', $oriSel)) ){
@@ -1506,7 +1505,7 @@ class DooSqlMagic {
                                             continue;
                                         }
                                     }
-
+	
 
                                     if($rfk!=NULL){
                                         if($k2===$rretrieved_pk_key){
@@ -1545,6 +1544,7 @@ class DooSqlMagic {
                             $model_pk_arr = array();
 
                             foreach($rs as $k=>$v){
+
                                 $fk = $v[$retrieved_pk_key];
                                 if($v[$retrieved_pk_key]==Null){
                                     //for many to many usage, if unmatched
@@ -1591,12 +1591,12 @@ class DooSqlMagic {
 										}
 
 										$gotoRelateSect = true;
-
+                                        
                                         $inAsSelect = preg_match('/[\s]+(as|AS|aS|As)[\s]+'. $k2 .',/', $oriSel.',');
-
-                                        if($inAsSelect || in_array($k2, $model_vars)){
-
-											if( !$inAsSelect && $oriSel[0]!=='*' &&
+                                        
+                                        if($inAsSelect || in_array($k2, $model_vars)){  
+                                            
+											if( !$inAsSelect && $oriSel[0]!=='*' && 
                                                 !preg_match("/,(\s+)?({$model->_table}\.)?$k2(\s+)?,/", ','.$oriSel.',') &&
                                                 !preg_match('/,(\s+)?'.$model->_table .'\.\*/', ','. str_replace($model->_table .'.'. str_replace('_'.$model->_table.'__', '', $k2), $model->_table .'.*', $oriSel)) ){
 
@@ -1712,6 +1712,7 @@ class DooSqlMagic {
                                             }
                                         }
                                     }
+
                                     array_push($record->{$rmodel}, $assoc_model);
                                     $arr[ $indexToChg ] = $record;
                                 }
@@ -1719,6 +1720,7 @@ class DooSqlMagic {
 
                     break;
                 }
+
                 //return the first object instead of an array of objects
                 if(isset($opt['limit']) && $opt['limit']=='first'){
                     if(isset($newtmodel)){
@@ -1935,9 +1937,8 @@ class DooSqlMagic {
         $fieldstr = substr($fieldstr, 0, strlen($fieldstr)-1);
 
         $sql ="INSERT INTO {$obj['_table']} ($fieldstr) VALUES ($valuestr)";
-//        echo $sql;
         $this->query($sql, $values);
-        return $this->lastInsertId();
+        return $this->pdo->lastInsertId();
     }
 
     /**
@@ -1950,7 +1951,7 @@ class DooSqlMagic {
     public function insert_attributes($model, $data){
         return $this->insertAttributes($model, $data);
     }
-
+    
     /**
      * Adds a new record with a list of keys & values (assoc array) (Prepares and execute the INSERT statements)
      * @param string|object $model The model object to be insert.
@@ -2127,6 +2128,7 @@ class DooSqlMagic {
                 $sql ="UPDATE {$obj['_table']} SET {$field_and_value} WHERE {$where}";
             }
         }
+
         return $this->query($sql, $values)->rowCount();
     }
 
@@ -2338,7 +2340,7 @@ class DooSqlMagic {
 			throw new SqlMagicException("No relationship mapping found between '{$model_name}' and '{$relate_model_name}'");
 		}
         $r1 = $map[$model_name];
-//        print_r($r1);exit;
+        #print_r($r1);
         $rtype = NULL;
 
         foreach($r1 as $k=>$v){

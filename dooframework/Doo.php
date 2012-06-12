@@ -262,15 +262,7 @@ class Doo{
     protected static function load($class_name, $path, $createObj=FALSE){
         if(is_string($class_name)===True){
 			$pure_class_name = basename($class_name);
-//            class_exists($pure_class_name, false)===True || require_once($path . "$class_name.php");
-            //edit------start
-            if(class_exists($pure_class_name, false)===false){
-            	if(!file_exists($path . "$class_name.php")){
-            		return false;
-            	}
-            	require_once($path . "$class_name.php");
-            }
-            //edit------end
+            class_exists($pure_class_name, false)===True || require_once($path . "$class_name.php");
             if($createObj)
                 return new $pure_class_name;
         }else if(is_array($class_name)===True){

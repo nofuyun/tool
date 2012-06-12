@@ -443,26 +443,13 @@ class DooValidator {
      * @return string
      */
     public function testCustom($value, $function, $options=null ,$msg=null){
-    	
         if($options==null){
-        	if(stripos($function , '::') !== false){
-        		$func = explode('::' , $function);
-        		$p = new $func[0];
-        		if($err = call_user_func(array(&$p , $func[1]), $value)){
-	                if($err!==true){
-	                    if($msg!==null) return $msg;
-	                    return $err;
-	                }
-	            }
-        	}else{
-        		if($err = call_user_func($function, $value)){
-	                if($err!==true){
-	                    if($msg!==null) return $msg;
-	                    return $err;
-	                }
-	            }
-        	}
-            
+            if($err = call_user_func($function, $value)){
+                if($err!==true){
+                    if($msg!==null) return $msg;
+                    return $err;
+                }
+            }
         }else{
             //if array, additional parameters
             if($err = call_user_func_array($function, array_merge(array($value), $options)) ){

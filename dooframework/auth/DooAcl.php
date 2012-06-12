@@ -200,7 +200,7 @@ class DooAcl {
 
 			if (isset($this->rules[$role]['failRoute'])) {
 				$route = $this->rules[$role]['failRoute'];
-				
+
 				if (is_string($route)) {
 					return array($route, 'internal');
 				} else {

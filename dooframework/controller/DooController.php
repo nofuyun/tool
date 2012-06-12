@@ -131,6 +131,7 @@ class DooController {
             Doo::loadCore('uri/DooLoader');
             $this->_load = new DooLoader;
         }
+
         return $this->_load;
     }
 
