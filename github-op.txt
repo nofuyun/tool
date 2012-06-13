@@ -31,7 +31,11 @@
     --push your commit
     git remote add origin https://github.com/nofuyun/Hello-World.git
     git push origin master
-     
+ 5.git如何merge github forked repository里的更新?
+   具体做法是下面三步，以前没用git这么搞过，知道之后其实蛮简单
+    1. >git remote add geoffyoungs http://github.com/geoffyoungs/ruby-gmail.git
+    2. >git fetch geoffyoungs
+    3. >git merge geoffyoungs/master
      
     
    
